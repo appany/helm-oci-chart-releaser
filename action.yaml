@@ -1,37 +1,42 @@
 name: Helm OCI Chart Releaser
-description: "Push Helm charts to OCI-based registries"
-author: "sergeyshaykhullin"
+description: Push Helm charts to OCI-based registries
+author: sergeyshaykhullin
 branding:
   color: orange
   icon: package
 inputs:
   image:
     required: true
-    description: ""
+    description: Chart name
   repository:
     required: true
-    description: ""
+    description: Chart repository name
   tag:
     required: true
-    description: ""
+    description: Chart version
   path:
     required: false
-    description: ""
+    description: Chart path
     default: charts
   registry:
     required: true
-    description: ""
+    description: OCI registry
   registry_username:
     required: true
-    description: ""
+    description: OCI registry username
   registry_password:
     required: true
-    description: ""
+    description: OCI registry password
 # TODO:
 # outputs:
 runs:
   using: composite
   steps:
+    - name: Helm | Experimental
+      id: helm_experimental
+      shell: bash
+      run: set HELM_EXPERIMENTAL_OCI=1
+
     - name: Helm | Login
       id: helm_login
       shell: bash
@@ -40,9 +45,11 @@ runs:
     - name: Helm | Chart
       id: helm_chart
       shell: bash
+      # TODO: ${{ inputs.path }} charts/image
       run: helm chart save ${{ inputs.path }} ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
 
     - name: Helm | Chart | Push
       id: helm_chart_push
       shell: bash
+      # TODO: ${{ inputs.path }} charts/image
       run: helm chart push ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
