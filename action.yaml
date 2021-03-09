@@ -29,14 +29,12 @@ inputs:
     description: OCI registry password
 # TODO:
 # outputs:
+
 runs:
   using: composite
+  env:
+    HELM_EXPERIMENTAL_OCI: 1
   steps:
-    - name: Helm | Experimental
-      id: helm_experimental
-      shell: bash
-      run: set HELM_EXPERIMENTAL_OCI=1
-
     - name: Helm | Login
       id: helm_login
       shell: bash
