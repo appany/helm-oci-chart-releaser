@@ -27,30 +27,24 @@ inputs:
   registry_password:
     required: true
     description: OCI registry password
-# TODO:
-# outputs:
 runs:
   using: composite
   steps:
     - name: Helm | Login
-      id: helm_login
       shell: bash
       run: echo ${{ inputs.registry_password }} | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
 
     - name: Helm | Chart
-      id: helm_chart
       shell: bash
-      # TODO: ${{ inputs.path }} charts/image
-      run: helm chart save ${{ inputs.path }} ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
+      run: helm chart save $PATH ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
+        PATH: ${{ inputs.path == 'charts' && format('{0}/{1}', inputs.path, inputs.image) || inputs.path }}
 
     - name: Helm | Chart | Push
-      id: helm_chart_push
       shell: bash
-      # TODO: ${{ inputs.path }} charts/image
       run: helm chart push ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
