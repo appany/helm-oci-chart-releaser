@@ -11,6 +11,9 @@
 ```yaml
 # Push Helm Chart to Github Container Registry
 
+# helm chart pull ghcr.io/appany/super-chart:0.1.0
+# helm chart export ghcr.io/appany/super-chart:0.1.0
+
 - name: Chart | Push
   uses: appany/helm-oci-chart-releaser@v1
   with:
@@ -22,10 +25,12 @@
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
 
-# helm chart pull ghcr.io/appany/super-chart:0.1.0
-# helm chart export ghcr.io/appany/super-chart:0.1.0
 
 # Push Helm Chart to Azure Container Registry
+
+# helm chart pull appany.azurecr.io/helm/super-chart:0.1.0
+# helm chart export appany.azurecr.io/helm/super-chart:0.1.0
+
 - name: Chart | Push
   uses: appany/helm-oci-chart-releaser@v1
   with:
@@ -36,9 +41,6 @@
     registry: appany.azurecr.io
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
-
-# helm chart pull appany.azurecr.io/helm/super-chart:0.1.0
-# helm chart export appany.azurecr.io/helm/super-chart:0.1.0
 ```
 
 ## Inputs
