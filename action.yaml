@@ -2,8 +2,8 @@ name: Helm OCI Chart Releaser
 description: Push Helm charts to OCI-based registries
 author: sergeyshaykhullin
 branding:
-  color: orange
-  icon: package
+  color: red
+  icon: alert-triangle
 inputs:
   image:
     required: true
