@@ -15,7 +15,7 @@
 # helm chart export ghcr.io/appany/super-chart:0.1.0
 
 - name: Chart | Push
-  uses: appany/helm-oci-chart-releaser@v1
+  uses: appany/helm-oci-chart-releaser@v0.1.0
   with:
     image: super-chart
     repository: appany
@@ -32,7 +32,7 @@
 # helm chart export appany.azurecr.io/helm/super-chart:0.1.0
 
 - name: Chart | Push
-  uses: appany/helm-oci-chart-releaser@v1
+  uses: appany/helm-oci-chart-releaser@v0.1.0
   with:
     image: super-chart
     repository: helm
