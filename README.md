@@ -24,6 +24,21 @@
 
 # helm chart pull ghcr.io/appany/super-chart:0.1.0
 # helm chart export ghcr.io/appany/super-chart:0.1.0
+
+# Push Helm Chart to Azure Container Registry
+- name: Chart | Push
+  uses: appany/helm-oci-chart-releaser@v1
+  with:
+    image: super-chart
+    repository: helm
+    tag: 0.1.0
+    path: charts/super-chart
+    registry: appany.azurecr.io
+    registry_username: ${{ secrets.REGISTRY_USERNAME }}
+    registry_password: ${{ secrets.REGISTRY_PASSWORD }}
+
+# helm chart pull appany.azurecr.io/helm/super-chart:0.1.0
+# helm chart export appany.azurecr.io/helm/super-chart:0.1.0
 ```
 
 ## Inputs
@@ -54,3 +69,7 @@ registry_password:
   required: true
   description: OCI registry password
 ```
+
+## License
+
+This project is distributed under the [MIT license](LICENSE.md).
