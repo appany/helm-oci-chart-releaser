@@ -1,4 +1,4 @@
-# 💥 Helm OCI Chart releaser 💥
+# 💥 Helm OCI Chart Releaser 💥
 
 🚀 Push Helm Charts to OCI-based registries! 🚀
 
