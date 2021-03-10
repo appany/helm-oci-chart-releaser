@@ -1,10 +1,10 @@
 # 💥 Helm OCI Chart releaser 💥
 
-🚀 Push Helm Charts to OCI-based registries. 🚀
+🚀 Push Helm Charts to OCI-based registries! 🚀
 
-💡 Store Helm Charts with your Docker images. No more need to host Helm repositories! ♿
+💡 Store **Helm Charts** with your **Docker images**. No more need to host Helm repositories ♿
 
-📝 More info about secure OCI-based hosting https://helm.sh/docs/topics/registries/
+📝 More info about secure **OCI-based** hosting https://helm.sh/docs/topics/registries/
 
 ## Usage
 
