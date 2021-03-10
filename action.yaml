@@ -38,10 +38,10 @@ runs:
 
     - name: Helm | Chart
       shell: bash
-      run: helm chart save $PATH ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
+      run: helm chart save $CHART_PATH ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
-        PATH: ${{ inputs.path == 'charts' && format('{0}/{1}', inputs.path, inputs.image) || inputs.path }}
+        CHART_PATH: ${{ inputs.path == 'charts' && format('{0}/{1}', inputs.path, inputs.image) || inputs.path }}
 
     - name: Helm | Chart | Push
       shell: bash
