@@ -58,7 +58,7 @@ inputs:
     description: Chart version
   path:
     required: false
-    description: Chart path
+    description: Chart path (Default 'charts/{name}')
   registry:
     required: true
     description: OCI registry
@@ -76,7 +76,7 @@ inputs:
 outputs:
   image:
     value: ${{ steps.output.outputs.image }}
-    description: '{registry}/{repository}/{image}:{tag}'
+    description: Chart image (Default '{registry}/{repository}/{image}:{tag}')
 ```
 
 ## ArgoCD
