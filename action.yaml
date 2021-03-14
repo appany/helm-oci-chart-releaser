@@ -1,11 +1,11 @@
 name: Helm OCI Chart Releaser
-description: Push Helm charts to OCI-based registries
+description: Push Helm charts to OCI-based (Docker) registries
 author: sergeyshaykhullin
 branding:
-  color: white
+  color: yellow
   icon: upload-cloud
 inputs:
-  image:
+  name:
     required: true
     description: Chart name
   repository:
@@ -17,7 +17,6 @@ inputs:
   path:
     required: false
     description: Chart path
-    default: charts
   registry:
     required: true
     description: OCI registry
@@ -27,24 +26,43 @@ inputs:
   registry_password:
     required: true
     description: OCI registry password
+outputs:
+  image:
+    value: ${{ steps.output.outputs.image }}
+    description: '{registry}/{repository}/{image}:{tag}'
 runs:
   using: composite
   steps:
     - name: Helm | Login
       shell: bash
-      run: echo ${{ inputs.registry_password }} | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
+      run: >-
+        echo ${{ inputs.registry_password }}
+        | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
 
     - name: Helm | Chart
       shell: bash
-      run: helm chart save $CHART_PATH ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
+      run: >-
+        helm chart save
+          ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }}
+          ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
-        CHART_PATH: ${{ inputs.path == 'charts' && format('{0}/{1}', inputs.path, inputs.image) || inputs.path }}
 
     - name: Helm | Chart | Push
       shell: bash
-      run: helm chart push ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.image }}:${{ inputs.tag }}
+      run: helm chart push ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
+
+    - name: Helm | Logout
+      shell: bash
+      run: helm registry logout ${{ inputs.registry }}
+      env:
+        HELM_EXPERIMENTAL_OCI: "1"
+
+    - name: Helm | Output
+      id: output
+      shell: bash
+      run: echo "::set-output name=image::${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}"
