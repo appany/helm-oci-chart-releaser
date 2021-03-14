@@ -43,10 +43,7 @@ runs:
 
     - name: Helm | Chart
       shell: bash
-      run: >-
-        helm chart save
-          ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }}
-          ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
+      run: helm chart save ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
 
