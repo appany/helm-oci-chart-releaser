@@ -35,9 +35,7 @@ runs:
   steps:
     - name: Helm | Login
       shell: bash
-      run: >-
-        echo ${{ inputs.registry_password }}
-        | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
+      run: echo ${{ inputs.registry_password }} | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
       env:
         HELM_EXPERIMENTAL_OCI: "1"
 
