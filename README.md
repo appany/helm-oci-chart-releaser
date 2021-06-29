@@ -14,16 +14,16 @@
 - name: Chart | Push
   uses: appany/helm-oci-chart-releaser@v0.2.0
   with:
-    name: super-chart
+    name: my-chart
     repository: appany
     tag: 0.1.0
-    path: charts/super-chart # Default charts/{name}
+    path: charts/my-chart # Default charts/{name}
     registry: ghcr.io
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
 
-# helm chart pull ghcr.io/appany/super-chart:0.1.0
-# helm chart export ghcr.io/appany/super-chart:0.1.0
+# helm chart pull ghcr.io/appany/my-chart:0.1.0
+# helm chart export ghcr.io/appany/my-chart:0.1.0
 ```
 
 - Push Helm Chart to **Azure Container Registry**
@@ -31,16 +31,16 @@
 - name: Chart | Push
   uses: appany/helm-oci-chart-releaser@v0.2.0
   with:
-    name: super-chart
+    name: my-chart
     repository: helm
     tag: 0.1.0
-    path: charts/super-chart # Default charts/{name}
+    path: charts/my-chart # Default charts/{name}
     registry: appany.azurecr.io
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
 
-# helm chart pull appany.azurecr.io/helm/super-chart:0.1.0
-# helm chart export appany.azurecr.io/helm/super-chart:0.1.0
+# helm chart pull appany.azurecr.io/helm/my-chart:0.1.0
+# helm chart export appany.azurecr.io/helm/my-chart:0.1.0
 ```
 
 ## Inputs
@@ -104,7 +104,7 @@ spec:
   source:
     repoURL: ghcr.io
     targetRevision: 0.1.0
-    chart: appany/super-chart
+    chart: appany/my-chart
     helm:
       ...
 ```
