@@ -39,15 +39,15 @@ runs:
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
-    - name: Helm | Chart
+    - name: Helm | Package
       shell: bash
-      run: helm chart save ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
+      run: helm package ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
-    - name: Helm | Chart | Push
+    - name: Helm | Push
       shell: bash
-      run: helm chart push ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
+      run: helm push ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
