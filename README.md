@@ -12,7 +12,7 @@
 
 ```yaml
 - name: Chart | Push
-  uses: appany/helm-oci-chart-releaser@v0.2.0
+  uses: appany/helm-oci-chart-releaser@v0.3.0
   with:
     name: my-chart
     repository: appany
@@ -28,7 +28,7 @@
 - Push Helm Chart to **Azure Container Registry**
 ```yaml
 - name: Chart | Push
-  uses: appany/helm-oci-chart-releaser@v0.2.0
+  uses: appany/helm-oci-chart-releaser@v0.3.0
   with:
     name: my-chart
     repository: helm
