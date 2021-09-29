@@ -22,8 +22,7 @@
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
 
-# helm chart pull ghcr.io/appany/my-chart:0.1.0
-# helm chart export ghcr.io/appany/my-chart:0.1.0
+# helm pull ghcr.io/appany/my-chart:0.1.0
 ```
 
 - Push Helm Chart to **Azure Container Registry**
@@ -39,8 +38,7 @@
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
 
-# helm chart pull appany.azurecr.io/helm/my-chart:0.1.0
-# helm chart export appany.azurecr.io/helm/my-chart:0.1.0
+# helm pull appany.azurecr.io/helm/my-chart:0.1.0
 ```
 
 ## Inputs
@@ -83,16 +81,18 @@ outputs:
 
 1. Add container registry and enable OCI support
 ```yaml
-repositories: |
-  - url: ghcr.io
+repositories:
+  ghcr:
+    url: ghcr.io
     type: helm
-    name: appany
-    enableOCI: true
+    name: ...
+    enableOCI: "true"
 
-repository.credentials: |
-  - url: ghcr.io
-    passwordSecret: ...
-    usernameSecret: ...
+credentialTemplates:
+  ghcr:
+    url: ghcr.io
+    username: ...
+    password: ...
 ```
 
 2. Create an Application

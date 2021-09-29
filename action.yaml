@@ -36,26 +36,18 @@ runs:
     - name: Helm | Login
       shell: bash
       run: echo ${{ inputs.registry_password }} | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
-      env:
-        HELM_EXPERIMENTAL_OCI: '1'
 
-    - name: Helm | Chart
+    - name: Helm | Package
       shell: bash
-      run: helm chart save ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
-      env:
-        HELM_EXPERIMENTAL_OCI: '1'
+      run: helm package ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} --version ${{ inputs.tag }}
 
-    - name: Helm | Chart | Push
+    - name: Helm | Push
       shell: bash
-      run: helm chart push ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
-      env:
-        HELM_EXPERIMENTAL_OCI: '1'
+      run: helm push ${{ inputs.name }}-${{ inputs.tag }}.tgz ${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}
 
     - name: Helm | Logout
       shell: bash
       run: helm registry logout ${{ inputs.registry }}
-      env:
-        HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Output
       id: output
