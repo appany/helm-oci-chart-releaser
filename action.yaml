@@ -47,7 +47,7 @@ runs:
 
     - name: Helm | Push
       shell: bash
-      run: helm push ${{ inputs.name }}-${{ inputs.tag }}.tgz oci://${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}
+      run: helm push ${{ inputs.name }}-${{ inputs.tag }}.tgz oci://${{ inputs.registry }}/${{ inputs.repository }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
