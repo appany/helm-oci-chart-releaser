@@ -60,4 +60,4 @@ runs:
     - name: Helm | Output
       id: output
       shell: bash
-      run: echo "::set-output name=image::${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}"
+      run: echo "image=${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}" >> $GITHUB_OUTPUT
