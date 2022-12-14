@@ -33,6 +33,13 @@ outputs:
 runs:
   using: composite
   steps:
+
+    - name: Mask Registry Password
+      run: |
+        echo "::add-mask::$REGISTRY_PASSWORD"
+      env:
+        REGISTRY_PASSWORD: ${{ needs.setup.outputs.registry_password }}
+
     - name: Helm | Login
       shell: bash
       run: echo ${{ inputs.registry_password }} | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
