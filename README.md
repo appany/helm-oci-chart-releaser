@@ -21,6 +21,7 @@
     registry: ghcr.io
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
+    update_dependencies: 'true' # Defaults to false
 
 # helm pull ghcr.io/appany/my-chart:0.1.0
 ```
@@ -37,6 +38,7 @@
     registry: appany.azurecr.io
     registry_username: ${{ secrets.REGISTRY_USERNAME }}
     registry_password: ${{ secrets.REGISTRY_PASSWORD }}
+    update_dependencies: 'true' # Defaults to false
 
 # helm pull appany.azurecr.io/helm/my-chart:0.1.0
 ```
@@ -66,6 +68,10 @@ inputs:
   registry_password:
     required: true
     description: OCI registry password
+  update_dependencies:
+    required: false
+    default: 'false'
+    description: Update chart dependencies before packaging (Default 'false')
 ```
 
 ## Outputs
