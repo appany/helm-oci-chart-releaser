@@ -11,6 +11,9 @@ inputs:
   repository:
     required: true
     description: Chart repository name
+  app_version:
+    description: "Chart Application Version"
+    required: false
   tag:
     required: true
     description: Chart version
@@ -31,12 +34,16 @@ inputs:
     default: 'false'
     description: Update chart dependencies before packaging (Default 'false')
 outputs:
+  digest:
+    value: ${{ steps.helm-push.outputs.digest }}
+    description: "Chart digest"
   image:
-    value: ${{ steps.output.outputs.image }}
+    value: ${{ steps.helm-push.outputs.image }}
     description: Chart image (Default '{registry}/{repository}/{image}:{tag}')
 runs:
   using: composite
   steps:
+
     - name: Helm | Login
       shell: bash
       run: echo ${{ inputs.registry_password }} | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
@@ -52,13 +59,18 @@ runs:
 
     - name: Helm | Package
       shell: bash
-      run: helm package ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} --version ${{ inputs.tag }}
+      run: helm package ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} --version ${{ inputs.tag }} --app-version ${{ inputs.app_version }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Push
       shell: bash
-      run: helm push ${{ inputs.name }}-${{ inputs.tag }}.tgz oci://${{ inputs.registry }}/${{ inputs.repository }}
+      id: helm-push
+      run: |
+        helm push ${{ inputs.name }}-${{ inputs.tag }}.tgz oci://${{ inputs.registry }}/${{ inputs.repository }} > digest 2>&1
+        DIGEST=$(sed -n '/Digest:/s/Digest: //p' digest)
+        echo "image=${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}" >> $GITHUB_OUTPUT
+        echo "digest=$DIGEST" >> $GITHUB_OUTPUT
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
@@ -67,8 +79,3 @@ runs:
       run: helm registry logout ${{ inputs.registry }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
-
-    - name: Helm | Output
-      id: output
-      shell: bash
-      run: echo "image=${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}" >> $GITHUB_OUTPUT
