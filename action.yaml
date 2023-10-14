@@ -15,7 +15,7 @@ inputs:
     description: "Chart Application Version"
     required: false
   tag:
-    required: true
+    required: false
     description: Chart version
   path:
     required: false
@@ -59,7 +59,7 @@ runs:
 
     - name: Helm | Package
       shell: bash
-      run: helm package ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} --version ${{ inputs.tag }} --app-version ${{ inputs.app_version }}
+      run: helm package ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} ${{ inputs.tag != '' && '--version=' + inputs.tag || '' }} ${{ inputs.app_version != '' && '--app-version=' + inputs.app_version || '' }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
