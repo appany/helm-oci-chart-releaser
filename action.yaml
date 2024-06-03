@@ -74,4 +74,4 @@ runs:
     - name: Helm | Output
       id: output
       shell: bash
-      run: echo 'image=${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}'' >> $GITHUB_OUTPUT
+      run: echo 'image=${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}' >> $GITHUB_OUTPUT
