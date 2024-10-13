@@ -42,7 +42,7 @@ runs:
   steps:
     - name: Helm | Login
       shell: bash
-      run: echo ${{ inputs.registry_password }} | helm registry login -u ${{ inputs.registry_username }} --password-stdin ${{ inputs.registry }}
+      run: echo '${{ inputs.registry_password }}' | helm registry login -u '${{ inputs.registry_username }}' --password-stdin '${{ inputs.registry }}'
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
@@ -55,23 +55,23 @@ runs:
 
     - name: Helm | Package
       shell: bash
-      run: helm package ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }} --version ${{ inputs.tag }} ${{ inputs.app_version != null && format('--app-version {0}', inputs.app_version) || '' }}
+      run: helm package '${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }}' --version '${{ inputs.tag }}' ${{ inputs.app_version != null && format('--app-version {0}', inputs.app_version) || '' }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Push
       shell: bash
-      run: helm push ${{ inputs.name }}-${{ inputs.tag }}.tgz oci://${{ inputs.registry }}/${{ inputs.repository }}
+      run: helm push '${{ inputs.name }}-${{ inputs.tag }}.tgz' 'oci://${{ inputs.registry }}/${{ inputs.repository }}'
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Logout
       shell: bash
-      run: helm registry logout ${{ inputs.registry }}
+      run: helm registry logout '${{ inputs.registry }}'
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Output
       id: output
       shell: bash
-      run: echo "image=${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}" >> $GITHUB_OUTPUT
+      run: echo 'image=${{ inputs.registry }}/${{ inputs.repository }}/${{ inputs.name }}:${{ inputs.tag }}' >> $GITHUB_OUTPUT
