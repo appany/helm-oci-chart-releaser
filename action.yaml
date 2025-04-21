@@ -47,7 +47,7 @@ runs:
         HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Dependency
-      if: inputs.update_dependencies == 'true'
+      if: ${{ inputs.update_dependencies == 'true' }}
       shell: bash
       run: helm dependency update ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }}
       env:
