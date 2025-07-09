@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    open-pull-requests-limit: 20
+    schedule:
+      interval: weekly
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: helm
+    directories:
+      - "/tests/charts/*"
+    open-pull-requests-limit: 20
+    schedule:
+      interval: weekly
+    groups:
+      helm-dependencies:
+        patterns:
+          - "*"
