@@ -65,7 +65,7 @@ runs:
         helm package \
           '${{ steps.prepare-variables.outputs.path }}' \
           --version '${{ inputs.tag }}' \
-          ${{ inputs.app_version != null && format('--app-version {0}', inputs.app_version) || '' }}
+          ${{ inputs.app_version != null && format('--app-version {0}', inputs.app_version) || '' }} \
           --destination $(dirname '${{ steps.prepare-variables.outputs.chart-file }}') \
       env:
         HELM_EXPERIMENTAL_OCI: '1'

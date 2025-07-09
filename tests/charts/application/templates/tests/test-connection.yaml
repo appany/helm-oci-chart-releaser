@@ -1,0 +1,43 @@
+# jscpd:ignore-start
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "test-application.fullname" . }}-test-connection"
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "test-application.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+  containers:
+    - name: wget
+      image: busybox@sha256:9ae97d36d26566ff84e8893c64a6dc4fe8ca6d1144bf5b87b2b85a32def253c7
+      command:
+        - /bin/sh
+        - -c
+        - |
+            echo "+ testing the application using wget"
+            set -x
+            wget -O /dev/null -q '{{ include "test-application.fullname" . }}:{{ .Values.service.port }}'
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "128Mi"
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        readOnlyRootFilesystem: true
+        runAsUser: 10001
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - NET_RAW
+            - ALL
+  restartPolicy: Never
+# jscpd:ignore-end
