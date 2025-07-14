@@ -46,22 +46,39 @@ runs:
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
+    - id: prepare-variables
+      shell: bash
+      run: |
+        echo "path=${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }}" >> $GITHUB_OUTPUT
+        echo "chart-file=${{ runner.temp }}/${{ inputs.name }}-${{ inputs.tag }}.tgz" >> $GITHUB_OUTPUT
+
     - name: Helm | Dependency
       if: ${{ inputs.update_dependencies == 'true' }}
       shell: bash
-      run: helm dependency update ${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }}
+      run: helm dependency update ${{ steps.prepare-variables.outputs.path }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Package
       shell: bash
-      run: helm package '${{ inputs.path == null && format('{0}/{1}', 'charts', inputs.name) || inputs.path }}' --version '${{ inputs.tag }}' ${{ inputs.app_version != null && format('--app-version {0}', inputs.app_version) || '' }}
+      run: |
+        helm package \
+          '${{ steps.prepare-variables.outputs.path }}' \
+          --version '${{ inputs.tag }}' \
+          ${{ inputs.app_version != null && format('--app-version {0}', inputs.app_version) || '' }} \
+          --destination $(dirname '${{ steps.prepare-variables.outputs.chart-file }}') \
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
     - name: Helm | Push
       shell: bash
-      run: helm push '${{ inputs.name }}-${{ inputs.tag }}.tgz' 'oci://${{ inputs.registry }}/${{ inputs.repository }}'
+      run: |
+        if [ ! -f '${{ steps.prepare-variables.outputs.chart-file }}' ]; then
+          echo "Chart file '${{ steps.prepare-variables.outputs.chart-file }}' does not exist. Please check the 'name' input matches the chart name."
+          exit 1
+        fi
+
+        helm push '${{ steps.prepare-variables.outputs.chart-file }}' 'oci://${{ inputs.registry }}/${{ inputs.repository }}'
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 

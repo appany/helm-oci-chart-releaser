@@ -1,0 +1,118 @@
+name: Common Continuous Integration tasks
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: actionlint
+        uses: raven-actions/actionlint@3a24062651993d40fed1019b58ac6fbdfbf276cc # v2.0.1
+
+  test-release-chart:
+    runs-on: ubuntu-latest
+    name: Test release chart
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Act
+        id: act
+        uses: ./
+        with:
+          name: ${{ github.event.repository.name }}
+          repository: ${{ github.repository }}/charts/application-test
+          tag: "0.1.0-${{ github.run_id }}"
+          path: tests/charts/application
+          registry: ghcr.io
+          registry_username: ${{ github.repository_owner }}
+          registry_password: ${{ github.token }}
+
+      - name: "Assert: outputs"
+        run: |
+          if [ "${{ steps.act.outputs.image }}" != "ghcr.io/${{ github.repository }}/charts/application-test/${{ github.event.repository.name }}:0.1.0-${{ github.run_id }}" ]; then
+            echo "Unexpected chart image name"
+            exit 1
+          fi
+
+      # Clean up package versions
+
+      - id: get-package-version-ids
+        if: always()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            // Retrieve package version IDs for the created chart tag
+            const packageName = `${{ github.event.repository.name }}/charts/application-test/${{ github.event.repository.name }}`;
+            const tag = `0.1.0-${{ github.run_id }}`;
+            const packageVersionIds = [];
+
+            async function rateLimitRetryCall (fn, ...args) {
+              try {
+                return await fn(...args)
+              } catch (error) {
+                if (error.status === 403 && error.headers['retry-after']) {
+                  const retryAfter = parseInt(error.headers['retry-after'], 10)
+                  await new Promise((resolve) =>
+                    setTimeout(resolve, (retryAfter + 1) * 1000)
+                  )
+                  return rateLimitRetryCall(fn, ...args)
+                }
+                throw error
+              }
+            }
+
+            async function getAllPackageVersions(page = 1) {
+              // Get all package versions for the package owned by the user
+              const { data } = await rateLimitRetryCall(
+                github.rest.packages.getAllPackageVersionsForPackageOwnedByUser,
+                {
+                  package_type: 'container',
+                  package_name: packageName,
+                  username: context.repo.owner,
+                  per_page: 100,
+                  page
+                }
+              )
+              return data
+            }
+
+            let currentPage = 1
+            for (;;) {
+              const data = await getAllPackageVersions(currentPage)
+
+              currentPage++
+
+              if (!data.length) {
+                break
+              }
+
+               // Filter package versions by tag
+              const matchingPackageVersionIds = data
+                .filter((version) => version.metadata.container.tags.includes(tag))
+                .map((version) => version.id)
+
+              packageVersionIds.push(...matchingPackageVersionIds);
+            }
+
+            const uniquePackageVersionIds = [...new Set(packageVersionIds)];
+
+            // Return the package version IDs as a comma-separated string
+            if (uniquePackageVersionIds.length > 0) {
+              core.setOutput('package-version-ids', uniquePackageVersionIds.join(','));
+            }
+
+      - name: Delete package versions
+        uses: actions/delete-package-versions@v5
+        if: always() && steps.get-package-version-ids.outputs.package-version-ids
+        with:
+          package-type: container
+          package-name: ${{ github.event.repository.name }}/charts/application-test/${{ github.event.repository.name }}
+          package-version-ids: ${{ steps.get-package-version-ids.outputs.package-version-ids }}
