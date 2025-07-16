@@ -12,7 +12,7 @@
 
 ```yaml
 - name: Chart | Push
-  uses: appany/helm-oci-chart-releaser@v0.4.2
+  uses: appany/helm-oci-chart-releaser@v0.5.0
   with:
     name: my-chart
     repository: appany
@@ -26,10 +26,44 @@
 # helm pull ghcr.io/appany/my-chart:0.1.0
 ```
 
+- Push Helm Chart to **Github Container Registry** and sign the package
+
+```yaml
+- name: Import GPG key
+  uses: crazy-max/ghaction-import-gpg@v6
+  id: gpg
+  with:
+    gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }} # Private key of the GPG key
+    passphrase: ${{ secrets.GPG_PASSPHRASE }} # Passphrase for the key, if required
+
+# Helm requires the legacy GPG format
+# @link https://helm.sh/docs/topics/provenance/#the-workflow
+- name: Convert GPG v2 key
+  run: |
+    gpg --export > ~/.gnupg/pubring.gpg
+    gpg --batch --pinentry-mode loopback --yes --passphrase '${{ secrets.GPG_PASSPHRASE }}' --export-secret-key > ~/.gnupg/secring.gpg
+- name: Chart | Push and sign
+  uses: appany/helm-oci-chart-releaser@v0.5.0
+  with:
+    name: my-chart
+    repository: appany
+    tag: 0.1.0
+    path: charts/my-chart # Default charts/{name}
+    registry: ghcr.io
+    registry_username: ${{ secrets.REGISTRY_USERNAME }}
+    registry_password: ${{ secrets.REGISTRY_PASSWORD }}
+    sign: true
+    signing_key: ${{ steps.gpg.outputs.name }}
+    signing_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+    update_dependencies: 'true' # Defaults to false
+
+# helm pull ghcr.io/appany/my-chart:0.1.0
+```
+
 - Push Helm Chart to **Azure Container Registry**
 ```yaml
 - name: Chart | Push
-  uses: appany/helm-oci-chart-releaser@v0.4.2
+  uses: appany/helm-oci-chart-releaser@v0.5.0
   with:
     name: my-chart
     repository: helm
@@ -68,6 +102,22 @@ inputs:
   registry_password:
     required: true
     description: OCI registry password
+  sign:
+    required: false
+    default: 'false'
+    description: Use a PGP private key to sign this package
+  signing_key:
+    required: false
+    default: ''
+    description: Name of the key to use when signing. Required if "sign" is true
+  signing_passphrase:
+    required: false
+    default: ''
+    description: Passphrase for the signing key
+  signing_keyring:
+    required: false
+    default: ~/.gnupg/secring.gpg
+    description: Location of the public keyring
   update_dependencies:
     required: false
     default: 'false'
