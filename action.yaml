@@ -29,6 +29,22 @@ inputs:
   registry_password:
     required: true
     description: OCI registry password
+  sign:
+    required: false
+    default: 'false'
+    description: Use a PGP private key to sign this package
+  signing_key:
+    required: false
+    default: ''
+    description: Name of the key to use when signing. Required if "sign" is true
+  signing_passphrase:
+    required: false
+    default: ''
+    description: Passphrase for the signing key
+  signing_keyring:
+    required: false
+    default: ~/.gnupg/secring.gpg
+    description: Location of the public keyring
   update_dependencies:
     required: false
     default: 'false'
@@ -62,11 +78,13 @@ runs:
     - name: Helm | Package
       shell: bash
       run: |
+        ${{ inputs.sign == 'true' && inputs.signing_passphrase && format('echo ''{0}'' | ', inputs.signing_passphrase) || '' }} \
         helm package \
           '${{ steps.prepare-variables.outputs.path }}' \
           --version '${{ inputs.tag }}' \
           ${{ inputs.app_version != null && format('--app-version {0}', inputs.app_version) || '' }} \
           --destination $(dirname '${{ steps.prepare-variables.outputs.chart-file }}') \
+          ${{ inputs.sign == 'true' && format('--sign --key ''{0}'' --keyring {1} --passphrase-file -', inputs.signing_key, inputs.signing_keyring) || '' }}
       env:
         HELM_EXPERIMENTAL_OCI: '1'
 
